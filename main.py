@@ -16,27 +16,36 @@ t = np.arange(-4e-6, 4e-6, 1 / fs)  # Time vector with padding
 freq = 2e6  # 2 MHz frequency
 pulse = utils.generate_pulse(t, freq, n_cycles)
 
-# Plot the pulse
+# Time shift the pulse by 90 degrees (π/2 radians)
+phase_shift = -np.pi/8
+shifted_pulse = utils.time_shift(pulse, t, phase_shift, freq)
+
+# Plot original and shifted pulses
 plt.figure(figsize=(10, 4))
-plt.plot(t * 1e6, pulse)
+plt.plot(t * 1e6, pulse, label='Original')
+plt.plot(t * 1e6, shifted_pulse, label=f'Shifted by {np.degrees(phase_shift):.0f}°')
 plt.grid(True)
 plt.xlabel("Time (μs)")
 plt.ylabel("Amplitude")
-plt.title("2 MHz Pulse")
+plt.title("2 MHz Pulse with Time Shift")
+plt.legend()
 plt.show()
 
 # %%
-# Perform I/Q demodulation
+# Perform I/Q demodulation on both signals
 i_demod, q_demod = utils.iq_demodulate(pulse, t, freq, fs)
+i_demod_shifted, q_demod_shifted = utils.iq_demodulate(shifted_pulse, t, freq, fs)
 
 # Plot I/Q components
-plt.figure()
-plt.plot(t * 1e6, i_demod, label="I Component")
-plt.plot(t * 1e6, q_demod, label="Q Component")
+plt.figure(figsize=(10, 4))
+plt.plot(t * 1e6, i_demod, '-', label="I Component (Original)", color='blue')
+plt.plot(t * 1e6, q_demod, '-', label="Q Component (Original)", color='red')
+plt.plot(t * 1e6, i_demod_shifted, '--', label="I Component (Shifted)", color='blue')
+plt.plot(t * 1e6, q_demod_shifted, '--', label="Q Component (Shifted)", color='red')
 plt.grid(True)
 plt.xlabel("Time (μs)")
 plt.ylabel("Amplitude")
-plt.title("I/Q Components")
+plt.title("I/Q Components - Original and Shifted Signals")
 plt.legend()
 plt.show()
 
